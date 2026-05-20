@@ -82,6 +82,11 @@ PY
 
 ## 3. Build PLUMED with the crystallization Module
 
+This build intentionally disables optional external libraries that are not
+needed for this tutorial. That keeps the local PLUMED kernel self-contained and
+avoids cluster-specific link-time issues with GSL, FFTW, BLAS/LAPACK, zlib, or
+OpenMP libraries from the conda environment.
+
 ```bash
 mkdir -p src software
 curl -L -o src/plumed-2.9.2.tgz \
@@ -95,7 +100,14 @@ export FC=${FC:-x86_64-conda-linux-gnu-gfortran}
 
 ./configure \
   --prefix="$PWD/../../software/plumed-envsim-linux" \
-  --enable-modules=crystallization
+  --enable-modules=crystallization \
+  --disable-mpi \
+  --disable-openmp \
+  --disable-external-blas \
+  --disable-external-lapack \
+  --disable-gsl \
+  --disable-fftw \
+  --disable-zlib
 
 make -j4
 make install
