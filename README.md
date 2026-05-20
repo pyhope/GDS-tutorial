@@ -62,7 +62,7 @@ python ../../../scripts/similarity/stat.py \
   -m mass \
   -f ../../../input/mass_only_example.xyz
 
-MPLBACKEND=Agg python ../../../scripts/plot.py
+python ../../../scripts/plot.py
 ```
 
 The key summary file is:

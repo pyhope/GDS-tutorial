@@ -168,7 +168,7 @@ python ../../scripts/similarity/merge_mgsiofe.py
 mkdir -p nw2
 cd nw2
 python ../../../scripts/similarity/stat.py -nw 2 -m mass -f ../merge.xyz
-MPLBACKEND=Agg python ../../../scripts/plot.py
+python ../../../scripts/plot.py
 ```
 
 Check:
