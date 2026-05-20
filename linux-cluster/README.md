@@ -8,20 +8,15 @@ per-atom local-environment similarity value `k`. If you only need GDS from mass
 density, use the top-level [README.md](../README.md) and the top-level
 `environment.yml`.
 
-## Can This Run on a Linux Cluster?
+The tested Linux route is:
 
-Yes. The Python GDS analysis is platform independent. The main care point is
-the LAMMPS+PLUMED part:
+- use conda to install Python, no-MPI LAMMPS, and compilers;
+- build a local no-MPI PLUMED kernel with the `crystallization` module;
+- explicitly point LAMMPS to that local kernel with `PLUMED_KERNEL`.
 
-- LAMMPS and PLUMED should both be no-MPI, or both be built with the same MPI
-  stack.
-- The conda PLUMED package may not include the `crystallization` module that
-  provides `ENVIRONMENTSIMILARITY`.
-- For this small two-frame tutorial, a no-MPI LAMMPS plus a no-MPI local PLUMED
-  kernel is the simplest robust setup.
-
-For large production trajectories, use cluster-specific LAMMPS and PLUMED
-builds that share the same MPI stack.
+The local PLUMED build disables optional external libraries that are not needed
+for this tutorial. This avoids cluster-specific link-time issues with GSL, FFTW,
+BLAS/LAPACK, zlib, and OpenMP.
 
 ## 1. Create the Conda Environment
 
@@ -36,13 +31,6 @@ cd ..
 
 If conda solving is slow on your cluster, use `mamba` or `micromamba` with the
 same `environment.yml`.
-
-This file pins a Linux no-MPI LAMMPS build that remains compatible with
-Python 3.10 and NumPy 1.26:
-
-```text
-lammps=2024.08.29=cpu_py310_h6af7cfc_nompi_1
-```
 
 Check the environment:
 
@@ -82,13 +70,11 @@ PY
 
 ## 3. Build PLUMED with the crystallization Module
 
-This build intentionally disables optional external libraries that are not
-needed for this tutorial. That keeps the local PLUMED kernel self-contained and
-avoids cluster-specific link-time issues with GSL, FFTW, BLAS/LAPACK, zlib, or
-OpenMP libraries from the conda environment.
+From the top-level `GDS-tutorial/` directory:
 
 ```bash
 mkdir -p src software
+rm -rf src/plumed-2.9.2 software/plumed-envsim-linux
 curl -L -o src/plumed-2.9.2.tgz \
   https://github.com/plumed/plumed2/releases/download/v2.9.2/plumed-2.9.2.tgz
 tar -xzf src/plumed-2.9.2.tgz -C src
@@ -114,29 +100,29 @@ make install
 cd ../..
 ```
 
-Verify:
+Verify the local kernel directly:
 
 ```bash
-software/plumed-envsim-linux/bin/plumed manual \
-  --action=ENVIRONMENTSIMILARITY | grep ENVIRONMENTSIMILARITY
+export LOCAL_PLUMED_LIB="$PWD/software/plumed-envsim-linux/lib"
+export PLUMED_KERNEL="$LOCAL_PLUMED_LIB/libplumedKernel.so"
+export LD_LIBRARY_PATH="$LOCAL_PLUMED_LIB:${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
 
-software/plumed-envsim-linux/bin/plumed config has mpi || true
+test -f "$PLUMED_KERNEL" && echo "$PLUMED_KERNEL"
+ldd "$PLUMED_KERNEL" | grep "not found" || true
+grep -a -o -m 1 "ENVIRONMENTSIMILARITY" "$PLUMED_KERNEL"
 ```
 
-The second command should print `mpi off`. It may return a non-zero exit code
-when MPI is off; that is fine.
-
-The PLUMED kernel file on Linux should be:
+The `ldd` command should print nothing. The `grep -a` command should print a
+single line:
 
 ```text
-software/plumed-envsim-linux/lib/libplumedKernel.so
+ENVIRONMENTSIMILARITY
 ```
 
-If in doubt:
-
-```bash
-ls software/plumed-envsim-linux/lib/libplumedKernel.*
-```
+Do not use `software/plumed-envsim-linux/bin/plumed manual` as the main check on
+this cluster. The executable can resolve `libplumedKernel.so` from the conda
+environment instead of the local PLUMED build. The LAMMPS step below uses the
+local kernel explicitly through `PLUMED_KERNEL`.
 
 ## 4. Run LAMMPS rerun with PLUMED
 
@@ -146,6 +132,8 @@ mkdir -p runs/example
 cd runs/example
 
 export PLUMED_KERNEL="$PWD/../../software/plumed-envsim-linux/lib/libplumedKernel.so"
+export LD_LIBRARY_PATH="$PWD/../../software/plumed-envsim-linux/lib:${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
+
 lmp -in ../../input/similarity_in.lammps
 ```
 
@@ -153,7 +141,7 @@ Successful output should include:
 
 ```text
 +++ Loading the PLUMED kernel runtime +++
-+++ PLUMED_KERNEL=".../libplumedKernel.so" +++
++++ PLUMED_KERNEL=".../software/plumed-envsim-linux/lib/libplumedKernel.so" +++
 ```
 
 `COLVAR` should contain two frames:
