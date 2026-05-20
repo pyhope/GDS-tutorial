@@ -119,11 +119,6 @@ single line:
 ENVIRONMENTSIMILARITY
 ```
 
-Do not use `software/plumed-envsim-linux/bin/plumed manual` as the main check on
-this cluster. The executable can resolve `libplumedKernel.so` from the conda
-environment instead of the local PLUMED build. The LAMMPS step below uses the
-local kernel explicitly through `PLUMED_KERNEL`.
-
 ## 4. Run LAMMPS rerun with PLUMED
 
 ```bash
