@@ -20,6 +20,68 @@ need the full workflow with `k`, use the platform-specific instructions:
 - [macos-arm64/README.md](macos-arm64/README.md)
 - [linux-cluster/README.md](linux-cluster/README.md)
 
+## Quick Start: Mass-Only GDS
+
+From this `GDS-tutorial/` directory:
+
+```bash
+mkdir -p software src runs
+conda env create -p "$PWD/software/conda-env-mass" -f environment.yml
+conda activate "$PWD/software/conda-env-mass"
+```
+
+Install Jie Deng's modified `pytim`:
+
+```bash
+git clone https://github.com/neojie/pytim.git src/pytim
+cd src/pytim
+python setup.py install
+cd ../..
+```
+
+Check the installation:
+
+```bash
+python - <<'PY'
+import pytim
+print("pytim", getattr(pytim, "__version__", "unknown"))
+print("file", pytim.__file__)
+print("has WillardChandler", hasattr(pytim, "WillardChandler"))
+PY
+```
+
+Run the mass-only example:
+
+```bash
+rm -rf runs/mass_only
+mkdir -p runs/mass_only/nw2
+cd runs/mass_only/nw2
+
+python ../../../scripts/similarity/stat.py \
+  -nw 2 \
+  -m mass \
+  -f ../../../input/mass_only_example.xyz
+
+MPLBACKEND=Agg python ../../../scripts/plot.py
+```
+
+The key summary file is:
+
+```text
+runs/mass_only/nw2/sum_proximity_0_1.txt
+```
+
+Expected values:
+
+```text
+# ../../../input/mass_only_example.xyz
+#  nw = 2
+#  solid liquid interface
+#  id O           Mg           Si           Fe          lw      chi
+0 910 13195 3303    7 5309 828    678 3889 1065    3088 156 2388        7.1419    0.0198
+1 895 13226 3287    8 5313 823    683 3891 1058    3066 159 2407        7.1188    0.0205
+```
+
 ## Important: Mass Mode Does Not Need k
 
 The most important practical point is:
@@ -86,103 +148,6 @@ For the full k-enabled path, the relevant inputs are:
 - `input/env1.pdb`: reference local environment for PLUMED.
 - `input/plumed.dat`: PLUMED input using `ENVIRONMENTSIMILARITY`.
 - `input/similarity_in.lammps`: LAMMPS rerun input.
-
-## Repository Layout
-
-```text
-GDS-tutorial/
-├── README.md
-├── environment.yml                  # mass-only environment
-├── macos-arm64/
-│   ├── README.md                    # full k-enabled workflow on Apple Silicon
-│   └── environment.yml
-├── linux-cluster/
-│   ├── README.md                    # full k-enabled workflow on Linux clusters
-│   └── environment.yml
-├── input/
-│   ├── mass_only_example.xyz
-│   ├── conf.lmp
-│   ├── npt.dump
-│   ├── env1.pdb
-│   ├── plumed.dat
-│   └── similarity_in.lammps
-├── scripts/
-│   ├── plot.py
-│   └── similarity/
-│       ├── merge_mgsiofe.py
-│       ├── stat.py
-│       ├── gds_analyzer.py
-│       └── stat_lib_base.py
-├── src/                             # created/used for downloaded source trees
-├── software/                        # local conda envs and local PLUMED installs
-└── runs/                            # reproducible outputs
-```
-
-`software/`, downloaded source trees under `src/`, and run outputs under
-`runs/` are intentionally ignored by Git. They are reproducible from the
-instructions below.
-
-## Quick Start: Mass-Only GDS
-
-From this `GDS-tutorial/` directory:
-
-```bash
-mkdir -p software src runs
-conda env create -p "$PWD/software/conda-env-mass" -f environment.yml
-conda activate "$PWD/software/conda-env-mass"
-```
-
-Install Jie Deng's modified `pytim`:
-
-```bash
-git clone https://github.com/neojie/pytim.git src/pytim
-cd src/pytim
-python setup.py install
-cd ../..
-```
-
-Check the installation:
-
-```bash
-python - <<'PY'
-import pytim
-print("pytim", getattr(pytim, "__version__", "unknown"))
-print("file", pytim.__file__)
-print("has WillardChandler", hasattr(pytim, "WillardChandler"))
-PY
-```
-
-Run the mass-only example:
-
-```bash
-rm -rf runs/mass_only
-mkdir -p runs/mass_only/nw2
-cd runs/mass_only/nw2
-
-python ../../../scripts/similarity/stat.py \
-  -nw 2 \
-  -m mass \
-  -f ../../../input/mass_only_example.xyz
-
-MPLBACKEND=Agg python ../../../scripts/plot.py
-```
-
-The key summary file is:
-
-```text
-runs/mass_only/nw2/sum_proximity_0_1.txt
-```
-
-Expected values:
-
-```text
-# ../../../input/mass_only_example.xyz
-#  nw = 2
-#  solid liquid interface
-#  id O           Mg           Si           Fe          lw      chi
-0 910 13195 3303    7 5309 828    678 3889 1065    3088 156 2388        7.1419    0.0198
-1 895 13226 3287    8 5313 823    683 3891 1058    3066 159 2407        7.1188    0.0205
-```
 
 ## Output Files
 
@@ -271,6 +236,41 @@ Open the platform-specific directory:
 - [linux-cluster/](linux-cluster/)
 
 Each directory contains a rendered `README.md` and a matching `environment.yml`.
+
+## Repository Layout
+
+```text
+GDS-tutorial/
+├── README.md
+├── environment.yml                  # mass-only environment
+├── macos-arm64/
+│   ├── README.md                    # full k-enabled workflow on Apple Silicon
+│   └── environment.yml
+├── linux-cluster/
+│   ├── README.md                    # full k-enabled workflow on Linux clusters
+│   └── environment.yml
+├── input/
+│   ├── mass_only_example.xyz
+│   ├── conf.lmp
+│   ├── npt.dump
+│   ├── env1.pdb
+│   ├── plumed.dat
+│   └── similarity_in.lammps
+├── scripts/
+│   ├── plot.py
+│   └── similarity/
+│       ├── merge_mgsiofe.py
+│       ├── stat.py
+│       ├── gds_analyzer.py
+│       └── stat_lib_base.py
+├── src/                             # created/used for downloaded source trees
+├── software/                        # local conda envs and local PLUMED installs
+└── runs/                            # reproducible outputs
+```
+
+`software/`, downloaded source trees under `src/`, and run outputs under
+`runs/` are intentionally ignored by Git. They are reproducible from the
+instructions above.
 
 ## Version Notes
 
