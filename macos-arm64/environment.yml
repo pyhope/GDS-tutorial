@@ -1,0 +1,25 @@
+name: gds-full-macos-arm64
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=1.26
+  - scipy
+  - pandas=2.2
+  - matplotlib
+  - cython<3
+  - ase
+  - mdanalysis=2.8
+  - lmfit
+  - pywavelets
+  - scikit-image
+  - dask
+  - setuptools<81
+  - lammps=2024.08.29=cpu_py310_h3515e86_nompi_1
+  - plumed=2.9.2
+  - make
+  - jq
+  - clangxx_osx-arm64
+  - gfortran_osx-arm64
+  - curl
+  - git

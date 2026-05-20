@@ -1,0 +1,26 @@
+name: gds-full-linux-64
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=1.26
+  - scipy
+  - pandas=2.2
+  - matplotlib
+  - cython<3
+  - ase
+  - mdanalysis=2.8
+  - lmfit
+  - pywavelets
+  - scikit-image
+  - dask
+  - setuptools<81
+  - lammps=2024.08.29=cpu_py310_h6af7cfc_nompi_1
+  - "plumed=2.9.2=*nompi*"
+  - c-compiler
+  - cxx-compiler
+  - fortran-compiler
+  - make
+  - jq
+  - curl
+  - git

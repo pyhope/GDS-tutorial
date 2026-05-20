@@ -1,0 +1,15 @@
+# Local environments and compiled dependencies
+software/
+src/*
+!src/.gitkeep
+
+# Reproducible run outputs
+runs/*
+!runs/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS metadata
+.DS_Store

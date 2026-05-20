@@ -1,0 +1,21 @@
+name: gds-mass-only
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=1.26
+  - scipy
+  - pandas=2.2
+  - matplotlib
+  - cython<3
+  - ase
+  - mdanalysis=2.8
+  - lmfit
+  - pywavelets
+  - scikit-image
+  - dask
+  - setuptools<81
+  - c-compiler
+  - cxx-compiler
+  - make
+  - git
