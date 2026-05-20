@@ -109,7 +109,7 @@ export FC=${FC:-x86_64-conda-linux-gnu-gfortran}
   --disable-fftw \
   --disable-zlib
 
-make -j4
+make -j16
 make install
 cd ../..
 ```
