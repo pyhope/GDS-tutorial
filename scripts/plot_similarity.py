@@ -1,3 +1,29 @@
+"""Plot GDS proximity-summary outputs.
+
+Author:
+	Haiyang Luo; Akash Gupta
+
+Overview:
+	This script plots ``sum_proximity_*.txt`` files produced by the GDS
+	similarity workflow. It reads the species list and ``nw`` value from the
+	commented file header, assigns the corresponding phase-count columns, plots
+	Phase A, Phase B, and Interface counts for each species, and reserves the
+	final row for ``lw`` and ``chi``. It also calculates simple plateau statistics
+	from the final fraction of frames and writes them to a text file.
+
+Sample commands:
+	python scripts/plot_similarity.py runs/mass_only/nw2/sum_proximity_0_1.txt
+
+	cd runs/mass_only/nw2
+	python ../../scripts/plot_similarity.py
+
+	python scripts/plot_similarity.py \
+		runs/mass_only/nw2/sum_proximity_0_1.txt \
+		--plateau-fraction 0.2 \
+		--output elemental_evolution_with_plateau_stats.pdf \
+		--stats-output plateau_stats.txt
+"""
+
 import argparse
 import math
 from pathlib import Path
